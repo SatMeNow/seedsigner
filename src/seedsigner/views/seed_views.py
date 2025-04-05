@@ -1190,13 +1190,12 @@ class SeedBIP85SelectChildIndexView(View):
                 skip_current_view=True
             )
 
-        return Destination(
-            SeedWordsWarningView,
-            view_args=dict(
-                seed_num=self.seed_num,
-                bip85_data=dict(child_index=int(ret), num_words=self.num_words),
-            )
-        )
+        parent = self.controller.storage.seeds[self.seed_num]
+        child = Seed(parent.get_bip85_child_mnemonic(
+            int(ret), self.num_words
+            ).split())
+        self.controller.storage.set_pending_seed(child)
+        return Destination(SeedFinalizeView)
 
 
 
